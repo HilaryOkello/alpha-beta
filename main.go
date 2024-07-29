@@ -28,6 +28,7 @@ type VaccineTransaction struct {
 	ManufacturerID string `json:"manufacturer_id"`
 	HealthFacilityID string `json:"health_facility_id"`
 	VaccineDetails string `json:"vaccine_details"`
+	TransactionType   string `json:"transaction_type"`
 	IsGenesis    bool   `json:"is_genesis"`
 }
 
@@ -133,6 +134,14 @@ func writeBlock(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("could not write block"))
 		return
 	}
+
+	// Ensure transaction type is specified
+	if transaction.TransactionType != "DistributorToManufacturer" && transaction.TransactionType != "FacilityToDistributor" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("invalid transaction type"))
+		return
+	}
+	
 	BlockChain.AddBlock(transaction)
 	resp, err := json.MarshalIndent(transaction, "", " ")
 	if err != nil {
