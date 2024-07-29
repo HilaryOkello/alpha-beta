@@ -125,29 +125,54 @@ func getBlockchain(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(jbytes))
 }
 
-// writeBlock handles adding a new block to the blockchain
-func writeBlock(w http.ResponseWriter, r *http.Request) {
+func createDistributorOrder(w http.ResponseWriter, r *http.Request) {
 	var transaction VaccineTransaction
 	if err := json.NewDecoder(r.Body).Decode(&transaction); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("could not write Block: %v", err)
-		w.Write([]byte("could not write block"))
+		log.Printf("could not create distributor order: %v", err)
+		w.Write([]byte("could not create distributor order"))
 		return
 	}
 
-	// Ensure transaction type is specified
-	if transaction.TransactionType != "DistributorToManufacturer" && transaction.TransactionType != "FacilityToDistributor" {
+	if transaction.TransactionType != "DistributorToManufacturer" {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("invalid transaction type"))
+		w.Write([]byte("invalid transaction type for distributor order"))
 		return
 	}
-	
+
 	BlockChain.AddBlock(transaction)
 	resp, err := json.MarshalIndent(transaction, "", " ")
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("could not marshal payload: %v", err)
-		w.Write([]byte("could not write block"))
+		w.Write([]byte("could not save distributor order"))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resp)
+}
+
+func createHealthFacilityOrder(w http.ResponseWriter, r *http.Request) {
+	var transaction VaccineTransaction
+	if err := json.NewDecoder(r.Body).Decode(&transaction); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("could not create health facility order: %v", err)
+		w.Write([]byte("could not create health facility order"))
+		return
+	}
+
+	if transaction.TransactionType != "FacilityToDistributor" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("invalid transaction type for health facility order"))
+		return
+	}
+
+	BlockChain.AddBlock(transaction)
+	resp, err := json.MarshalIndent(transaction, "", " ")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("could not marshal payload: %v", err)
+		w.Write([]byte("could not save health facility order"))
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -185,7 +210,8 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", getBlockchain).Methods("GET")
-	r.HandleFunc("/", writeBlock).Methods("POST")
+	r.HandleFunc("/distributor-order", createDistributorOrder).Methods("POST")
+	r.HandleFunc("/health-facility-order", createHealthFacilityOrder).Methods("POST")
 	r.HandleFunc("/new-vaccine", newVaccine).Methods("POST")
 
 	go func() {
