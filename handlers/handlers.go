@@ -51,7 +51,7 @@ func DistributorDashboard(w http.ResponseWriter, r *http.Request) {
 }
 
 func HealthFacilityDashboard(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/health_facility_dashboard.html"))
+	tmpl := template.Must(template.ParseFiles("templates/pharmacy.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
