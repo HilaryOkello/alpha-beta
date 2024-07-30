@@ -1,9 +1,9 @@
 import React from "react";
 
-function HomePage() {
+function HomePage({ user }) {
   return (
     <div>
-      <h1>Hi</h1>
+      <h1>Hello from the HomePage</h1>
     </div>
   );
 }
