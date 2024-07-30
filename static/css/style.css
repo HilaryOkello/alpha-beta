@@ -63,13 +63,13 @@ input[type="password"]:focus,
 input[type="number"]:focus,
 select:focus,
 textarea:focus {
-    border-color: #5cb85c;
+    border-color: #4f52e2;
     outline: none;
 }
 
 button {
     padding: 12px;
-    background-color: #5cb85c;
+    background-color: #4f52e2;
     color: white;
     border: none;
     border-radius: 4px;
@@ -79,7 +79,7 @@ button {
 }
 
 button:hover {
-    background-color: #4cae4c;
+    background-color: #4f52e2;
 }
 
 /* Table Styles */
@@ -127,7 +127,7 @@ th {
     display: block;
     text-align: center;
     margin: 10px 0;
-    color: #007bff;
+    color: #092a4d;
     text-decoration: none;
 }
 
