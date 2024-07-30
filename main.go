@@ -1,12 +1,13 @@
 package main
 
 import (
-	"alpha-beta/blockchain"
-	"alpha-beta/handlers"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+
+	"alpha-beta/blockchain"
+	"alpha-beta/handlers"
 
 	"github.com/gorilla/mux"
 )
@@ -16,6 +17,8 @@ func main() {
 	blockchain.BlockChain = blockchain.NewBlockchain()
 
 	r := mux.NewRouter()
+
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	// Serve HTML templates
 	r.HandleFunc("/", handlers.BlockchainPage).Methods("GET")

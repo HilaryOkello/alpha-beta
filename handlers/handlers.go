@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"alpha-beta/blockchain"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
@@ -9,6 +8,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+
+	"alpha-beta/blockchain"
 )
 
 // Vaccine represents a vaccine with details
@@ -38,7 +39,7 @@ func DistributorOrderPage(w http.ResponseWriter, r *http.Request) {
 
 // Serve the HTML form for creating a health facility order
 func HealthFacilityOrderPage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/health-facility-order.html"))
+	tmpl := template.Must(template.ParseFiles("templates/pharmacy.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
@@ -46,7 +47,7 @@ func HealthFacilityOrderPage(w http.ResponseWriter, r *http.Request) {
 
 // Serve the HTML form for creating a new vaccine
 func NewVaccinePage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/new-vaccine.html"))
+	tmpl := template.Must(template.ParseFiles("templates/manufacturer.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
