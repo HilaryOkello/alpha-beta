@@ -2,10 +2,53 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpha-Beta Page</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Alpha-Beta</title>
 </head>
+<style> 
+body {
+    
+    font-family: Arial, sans-serif;
+    background-color: #ece7e7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container {
+    background-color: white;
+    padding: 20px;
+}
+
+h2 {
+    text-align: center;
+    font-size: 40px
+}
+
+input[type="text"], input[type="password"] {
+    width: 95%;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4ead4e;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #278627;
+}
+
+.error {
+    color: red;
+    text-align: center;
+}
+</style>
 <body>
     <div class="login-container">
         <form id="loginForm">
