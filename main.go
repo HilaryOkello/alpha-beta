@@ -25,11 +25,13 @@ func main() {
 	r.HandleFunc("/create-distributor-order", handlers.DistributorOrderPage).Methods("GET")
 	r.HandleFunc("/create-health-facility-order", handlers.HealthFacilityOrderPage).Methods("GET")
 	r.HandleFunc("/create-new-vaccine", handlers.NewVaccinePage).Methods("GET")
+	r.HandleFunc("/manufacturer-dashboard", handlers.Manufacturerdashboard).Methods("GET")
 
-	// r.HandleFunc("/", getBlockchain).Methods("GET")
+	// r.HandleFunc("/", getBlockchain).Methods("POST")
 	r.HandleFunc("/distributor-order", handlers.CreateDistributorOrder).Methods("POST")
 	r.HandleFunc("/health-facility-order", handlers.CreateHealthFacilityOrder).Methods("POST")
 	r.HandleFunc("/new-vaccine", handlers.NewVaccine).Methods("POST")
+	r.HandleFunc("/manufacturer-dashboard", handlers.Manufacturerdashboard).Methods("POST")
 
 	go func() {
 		for _, block := range blockchain.BlockChain.Blocks {
