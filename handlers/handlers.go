@@ -5,10 +5,28 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 
 	"alpha-beta/blockchain"
+	"alpha-beta/database"
+
 	"github.com/google/uuid"
 )
+
+type Order struct {
+	ID               int
+	ManufacturerID   string
+	HealthFacilityID string
+	VaccineDetails   string
+	TransactionType  string
+	Status           string
+	CreatedAt        time.Time
+}
+
+type PageVariables struct {
+	PendingOrders   []Order
+	FulfilledOrders []Order
+}
 
 func generateOrderID() string {
 	return uuid.New().String()
@@ -34,6 +52,20 @@ func CreateHealthFacilityOrder(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Printf("could not marshal order details: %v", err)
 		w.Write([]byte("could not marshal order details"))
+		return
+	}
+
+	// Insert order details into the database
+	insertQuery := `
+	INSERT INTO orders (manufacturer_id, health_facility_id, vaccine_details, transaction_type, status)
+	VALUES (?, ?, ?, ?, ?);
+	`
+
+	_, err = database.DB.Exec(insertQuery, orderDetails.ManufacturerID, orderDetails.HealthFacilityID, orderDetails.VaccineDetails, orderDetails.TransactionType, orderDetails.Status)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("could not insert order details into database: %v", err)
+		w.Write([]byte("could not insert order details into database"))
 		return
 	}
 

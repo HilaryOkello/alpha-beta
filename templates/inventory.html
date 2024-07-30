@@ -27,11 +27,13 @@
         <tr>
             <th>Order ID</th>
             <th>Details</th>
+            <th>Timestamp</th>
         </tr>
         {{range .FulfilledOrders}}
         <tr>
             <td>{{.Data.OrderID}}</td>
             <td>{{.Data.Details}}</td>
+            <td>{{.Timestamp}}</td>
         </tr>
         {{end}}
     </table>

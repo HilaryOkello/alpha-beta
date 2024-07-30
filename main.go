@@ -5,12 +5,15 @@ import (
 	"net/http"
 
 	"alpha-beta/blockchain"
+	"alpha-beta/database"
 	"alpha-beta/handlers"
 
 	"github.com/gorilla/mux"
 )
 
 func main() {
+	database.InitDB()
+
 	blockchain.BlockChain = blockchain.NewBlockchain()
 
 	r := mux.NewRouter()
