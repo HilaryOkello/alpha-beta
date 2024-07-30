@@ -14,6 +14,21 @@
         <button onclick="showOrders()">View Orders</button>
 
         <div id="content"></div>
+
+        <!-- Hidden data for demonstration purposes -->
+        <div id="data" style="display:none;">
+            <div id="availableVaccinesData" data-vaccines='[
+                {"name": "Vaccine A", "quantity": 100, "expiryDate": "2024-12-31"},
+                {"name": "Vaccine B", "quantity": 200, "expiryDate": "2025-01-15"},
+                {"name": "Vaccine C", "quantity": 300, "expiryDate": "2024-11-30"}
+            ]'></div>
+
+            <div id="ordersData" data-orders='[
+                {"id": 1, "vaccine": "Vaccine A", "quantity": 50, "status": "Pending", "orderDate": "2024-07-01"},
+                {"id": 2, "vaccine": "Vaccine B", "quantity": 100, "status": "Shipped", "orderDate": "2024-06-15"},
+                {"id": 3, "vaccine": "Vaccine C", "quantity": 150, "status": "Delivered", "orderDate": "2024-05-20"}
+            ]'></div>
+        </div>
     </div>
 
     <script>
@@ -43,18 +58,14 @@
                 const quantity = document.getElementById('quantity').value;
                 const deliveryDate = document.getElementById('deliveryDate').value;
                 const priority = document.getElementById('priority').value;
-                // Add order submission logic here
                 alert(`Order for ${quantity} units of ${vaccineName} added. Delivery Date: ${deliveryDate}, Priority: ${priority}`);
             });
         }
 
         function showAvailableVaccine() {
-            // Dummy data for available vaccines
-            const availableVaccines = [
-                { name: 'Vaccine A', quantity: 100, expiryDate: '2024-12-31' },
-                { name: 'Vaccine B', quantity: 200, expiryDate: '2025-01-15' },
-                { name: 'Vaccine C', quantity: 300, expiryDate: '2024-11-30' }
-            ];
+            // Retrieve data from hidden element
+            const vaccinesData = document.getElementById('availableVaccinesData').getAttribute('data-vaccines');
+            const availableVaccines = JSON.parse(vaccinesData);
 
             let content = '<h3>Available Vaccines</h3><table><tr><th>Name</th><th>Quantity</th><th>Expiry Date</th></tr>';
             availableVaccines.forEach(vaccine => {
@@ -65,12 +76,9 @@
         }
 
         function showOrders() {
-            // Dummy data for orders
-            const orders = [
-                { id: 1, vaccine: 'Vaccine A', quantity: 50, status: 'Pending', orderDate: '2024-07-01' },
-                { id: 2, vaccine: 'Vaccine B', quantity: 100, status: 'Shipped', orderDate: '2024-06-15' },
-                { id: 3, vaccine: 'Vaccine C', quantity: 150, status: 'Delivered', orderDate: '2024-05-20' }
-            ];
+            // Retrieve data from hidden element
+            const ordersData = document.getElementById('ordersData').getAttribute('data-orders');
+            const orders = JSON.parse(ordersData);
 
             let content = '<h3>Orders</h3><table><tr><th>Order ID</th><th>Vaccine</th><th>Quantity</th><th>Status</th><th>Order Date</th></tr>';
             orders.forEach(order => {

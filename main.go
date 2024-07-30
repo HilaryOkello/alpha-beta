@@ -36,7 +36,7 @@ func main() {
 	r.HandleFunc("/add-health-facility-order", handlers.HealthFacilityOrderPage).Methods("GET")
 	r.HandleFunc("/add-vaccine", handlers.AddVaccinePage).Methods("GET")
 
-	// r.HandleFunc("/", getBlockchain).Methods("GET")
+	// r.HandleFunc("/", getBlockchain).Methods("POST")
 	r.HandleFunc("/distributor-order", handlers.CreateDistributorOrder).Methods("POST")
 	r.HandleFunc("/health-facility-order", handlers.CreateHealthFacilityOrder).Methods("POST")
 	r.HandleFunc("/new-vaccine", handlers.NewVaccine).Methods("POST")

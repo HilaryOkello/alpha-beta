@@ -102,6 +102,14 @@ func AddVaccinePage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Serve the HTML form for manufacturer's dashboard
+func Manufacturerdashboard(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/manufacturer.html"))
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	}
+}
+
 func CreateDistributorOrder(w http.ResponseWriter, r *http.Request) {
 	var transaction blockchain.VaccineTransaction
 	if err := json.NewDecoder(r.Body).Decode(&transaction); err != nil {
