@@ -49,7 +49,7 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="ud-banner-content">
-              <h1>Order Vaccine From Manufacturer </h1>
+              <h1>Administer Vaccine to Patient</h1>
             </div>
           </div>
         </div>
@@ -57,13 +57,21 @@
     </section>
     <!-- ====== Banner End ====== -->
 
-    <!-- ====== Order Form Start ====== -->
+    <!-- ====== Administer Vaccine Form Start ====== -->
     <section class="ud-login">
       <div class="container">
         <div class="row">
           <div class="col-lg-12">
             <div class="ud-login-wrapper">
               <form class="ud-login-form">
+                <div class="ud-form-group">
+                  <input
+                    type="text"
+                    name="patient_admission_no"
+                    placeholder="Enter Patient Admission Number"
+                    class="form-control"
+                  />
+                </div>
                 <div class="ud-form-group">
                   <select name="vaccine" class="form-control">
                     <option value="">Select Vaccine</option>
@@ -82,14 +90,22 @@
                 </div>
                 <div class="ud-form-group">
                   <input
-                    type="number"
-                    name="quantity_no"
-                    placeholder="Enter Quantity"
+                    type="text"
+                    name="batch_no"
+                    placeholder="Enter Batch Number"
                     class="form-control"
                   />
                 </div>
                 <div class="ud-form-group">
-                  <button type="submit" class="ud-main-btn w-100">Order Vaccine</button>
+                  <input
+                    type="date"
+                    name="administer_date"
+                    placeholder="Administer Date"
+                    class="form-control"
+                  />
+                </div>
+                <div class="ud-form-group">
+                  <button type="submit" class="ud-main-btn w-100">Administer Vaccine</button>
                 </div>
               </form>
             </div>
@@ -97,7 +113,7 @@
         </div>
       </div>
     </section>
-    <!-- ====== Order Form End ====== -->
+    <!-- ====== Administer Vaccine Form End ====== -->
 
     <!-- ====== Footer Start ====== -->
     <footer class="ud-footer wow fadeInUp" data-wow-delay=".15s">
