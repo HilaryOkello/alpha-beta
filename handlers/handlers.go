@@ -1,133 +1,75 @@
 package handlers
 
 import (
-	"crypto/sha256"
 	"encoding/json"
-	"fmt"
 	"html/template"
-	"io"
 	"log"
 	"net/http"
 
 	"alpha-beta/blockchain"
+	"github.com/google/uuid"
 )
 
-// Vaccine represents a vaccine with details
-type Vaccine struct {
-	ID           string `json:"id"`
-	Type         string `json:"type"`
-	Manufacturer string `json:"manufacturer"`
-	ExpiryDate   string `json:"expiry_date"`
-	BatchNumber  string `json:"batch_number"`
-}
-
-// Serve the HTML form for the blockchain view
-func BlockchainPage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/index.html"))
-	if err := tmpl.Execute(w, nil); err != nil {
-		http.Error(w, "Unable to render page", http.StatusInternalServerError)
-	}
-}
-
-// Serve the HTML form for creating a distributor order
-func DistributorOrderPage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/distributor-order.html"))
-	if err := tmpl.Execute(w, nil); err != nil {
-		http.Error(w, "Unable to render page", http.StatusInternalServerError)
-	}
-}
-
-// Serve the HTML form for creating a health facility order
-func HealthFacilityOrderPage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/pharmacy.html"))
-	if err := tmpl.Execute(w, nil); err != nil {
-		http.Error(w, "Unable to render page", http.StatusInternalServerError)
-	}
-}
-
-// Serve the HTML form for creating a new vaccine
-func NewVaccinePage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/manufacturer.html"))
-	if err := tmpl.Execute(w, nil); err != nil {
-		http.Error(w, "Unable to render page", http.StatusInternalServerError)
-	}
-}
-
-func CreateDistributorOrder(w http.ResponseWriter, r *http.Request) {
-	var transaction blockchain.VaccineTransaction
-	if err := json.NewDecoder(r.Body).Decode(&transaction); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("could not create distributor order: %v", err)
-		w.Write([]byte("could not create distributor order"))
-		return
-	}
-
-	if transaction.TransactionType != "DistributorToManufacturer" {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("invalid transaction type for distributor order"))
-		return
-	}
-
-	blockchain.BlockChain.AddBlock(transaction)
-	resp, err := json.MarshalIndent(transaction, "", " ")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("could not marshal payload: %v", err)
-		w.Write([]byte("could not save distributor order"))
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+func generateOrderID() string {
+	return uuid.New().String()
 }
 
 func CreateHealthFacilityOrder(w http.ResponseWriter, r *http.Request) {
-	var transaction blockchain.VaccineTransaction
-	if err := json.NewDecoder(r.Body).Decode(&transaction); err != nil {
+	var orderDetails struct {
+		ManufacturerID   string `json:"manufacturer_id"`
+		HealthFacilityID string `json:"health_facility_id"`
+		VaccineDetails   string `json:"vaccine_details"`
+		TransactionType  string `json:"transaction_type"`
+		Status           string `json:"status"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&orderDetails); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("could not create health facility order: %v", err)
-		w.Write([]byte("could not create health facility order"))
+		log.Printf("could not decode order details: %v", err)
+		w.Write([]byte("could not decode order details"))
 		return
 	}
 
-	if transaction.TransactionType != "FacilityToDistributor" {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("invalid transaction type for health facility order"))
+	detailsBytes, err := json.Marshal(orderDetails)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Printf("could not marshal order details: %v", err)
+		w.Write([]byte("could not marshal order details"))
 		return
+	}
+
+	transaction := blockchain.VaccineTransaction{
+		OrderID:   generateOrderID(),
+		IsGenesis: false,
+		Details:   string(detailsBytes),
 	}
 
 	blockchain.BlockChain.AddBlock(transaction)
-	resp, err := json.MarshalIndent(transaction, "", " ")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("could not marshal payload: %v", err)
-		w.Write([]byte("could not save health facility order"))
-		return
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+
+	http.Redirect(w, r, "/inventory", http.StatusSeeOther)
 }
 
-// newVaccine handles creating a new vaccine record
-func NewVaccine(w http.ResponseWriter, r *http.Request) {
-	var vaccine Vaccine
-	if err := json.NewDecoder(r.Body).Decode(&vaccine); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("could not create: %v", err)
-		w.Write([]byte("could not create new Vaccine"))
-		return
+func InventoryPage(w http.ResponseWriter, r *http.Request) {
+	type InventoryData struct {
+		PendingOrders   []*blockchain.Block
+		FulfilledOrders []*blockchain.Block
 	}
 
-	h := sha256.New()
-	io.WriteString(h, vaccine.BatchNumber+vaccine.ExpiryDate)
-	vaccine.ID = fmt.Sprintf("%x", h.Sum(nil))
+	var inventoryData InventoryData
 
-	resp, err := json.MarshalIndent(vaccine, "", " ")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("could not marshal payload: %v", err)
-		w.Write([]byte("could not save vaccine data"))
-		return
+	for _, block := range blockchain.BlockChain.Blocks {
+		var details struct {
+			Status string `json:"status"`
+		}
+		json.Unmarshal([]byte(block.Data.Details), &details)
+		if details.Status == "Pending" {
+			inventoryData.PendingOrders = append(inventoryData.PendingOrders, block)
+		} else {
+			inventoryData.FulfilledOrders = append(inventoryData.FulfilledOrders, block)
+		}
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+
+	tmpl := template.Must(template.ParseFiles("templates/inventory.html"))
+	if err := tmpl.Execute(w, inventoryData); err != nil {
+		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	}
 }
