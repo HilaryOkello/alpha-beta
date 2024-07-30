@@ -80,7 +80,7 @@ func AddManufacturerPage(w http.ResponseWriter, r *http.Request) {
 
 // Serve the HTML form for creating a distributor order
 func DistributorOrderPage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/distributor-order.html"))
+	tmpl := template.Must(template.ParseFiles("templates/distributor_order.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
