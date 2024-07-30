@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distributor Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div class="container">
+        <h1>Distributor Dashboard</h1>
+        <h2>Manage Manufacturers and Pharmacists</h2>
+        <button onclick="addManufacturer()">Add New Manufacturer</button>
+        <button onclick="addPharmacist()">Add New Pharmacist</button>
+        
+        <h2>Place Orders</h2>
+        <form id="orderForm">
+            <label for="manufacturer">Select Manufacturer:</label>
+            <select id="manufacturer">
+                <option value="manufacturer1">Manufacturer 1</option>
+                <option value="manufacturer2">Manufacturer 2</option>
+            </select>
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" required>
+            <button type="submit">Place Order</button>
+        </form>
+        
+        <h2>Orders from Pharmacies</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Pharmacy Name</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>003</td>
+                    <td>Pharmacy C</td>
+                    <td>200</td>
+                    <td>Pending</td>
+                </tr>
+            </tbody>
+        </table>
+        <a href="index.html">Logout</a>
+    </div>
+
+    <script>
+        function addManufacturer() {
+            alert('Add Manufacturer functionality to be implemented.');
+        }
+
+        function addPharmacist() {
+            alert('Add Pharmacist functionality to be implemented.');
+        }
+
+        document.getElementById('orderForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            alert('Order placed successfully!');
+        });
+    </script>
+</body>
+</html>
