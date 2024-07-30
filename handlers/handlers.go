@@ -44,21 +44,21 @@ func SignupPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func DistributorDashboard(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/distributor_dashboard.html"))
+	tmpl := template.Must(template.ParseFiles("templates/distributor.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
 }
 
 func HealthFacilityDashboard(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/health_facility_dashboard.html"))
+	tmpl := template.Must(template.ParseFiles("templates/pharmacy.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
 }
 
 func ManufacturerDashboard(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/manufacturer_dashboard.html"))
+	tmpl := template.Must(template.ParseFiles("templates/manufacturer.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
