@@ -15,9 +15,9 @@ class DistributorsController < ApplicationController
         else
           render json: { error: 'distributor not found' }, status: :unauthorized
         end
-      end
+    end
 
-      private
+    private
 
       def distributor_params
         params.permit(:username, :password, :password_confirmation)
