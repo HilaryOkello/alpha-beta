@@ -22,8 +22,57 @@ type Vaccine struct {
 }
 
 // Serve the HTML form for the blockchain view
-func BlockchainPage(w http.ResponseWriter, r *http.Request) {
+func IndexPage(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	}
+}
+
+func LoginPage(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/login.html"))
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	}
+}
+
+func SignupPage(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/signup.html"))
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	}
+}
+
+func DistributorDashboard(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/distributor_dashboard.html"))
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	}
+}
+
+func HealthFacilityDashboard(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/health_facility_dashboard.html"))
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	}
+}
+
+func ManufacturerDashboard(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/manufacturer_dashboard.html"))
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	}
+}
+
+func AddFacilityPage(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/add_facility.html"))
+	if err := tmpl.Execute(w, nil); err != nil {
+		http.Error(w, "Unable to render page", http.StatusInternalServerError)
+	}
+}
+
+func AddManufacturerPage(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/add_manufacturer.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
@@ -46,8 +95,8 @@ func HealthFacilityOrderPage(w http.ResponseWriter, r *http.Request) {
 }
 
 // Serve the HTML form for creating a new vaccine
-func NewVaccinePage(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/manufacturer.html"))
+func AddVaccinePage(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(template.ParseFiles("templates/add_vaccine.html"))
 	if err := tmpl.Execute(w, nil); err != nil {
 		http.Error(w, "Unable to render page", http.StatusInternalServerError)
 	}
