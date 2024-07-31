@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
-	"io"
 	"net/http"
 	"time"
 )
@@ -20,12 +19,17 @@ type Block struct {
 
 // VaccineTransaction represents a transaction related to vaccine distribution
 type VaccineTransaction struct {
-	OrderID          string `json:"order_id"`
-	ManufacturerID   string `json:"manufacturer_id"`
-	HealthFacilityID string `json:"health_facility_id"`
-	VaccineDetails   string `json:"vaccine_details"`
-	TransactionType  string `json:"transaction_type"`
-	IsGenesis        bool   `json:"is_genesis"`
+	OrderID        string `json:"order_id"`
+	IsGenesis      bool   `json:"is_genesis"`
+	Details        string `json:"details"`
+	Manufacturer   string `json:"manufacturer"`
+	Distributor    string `json:"distributor"`
+	HealthFacility string `json:"health_facility"`
+	AdministeredTo string `json:"administered_to"`
+	Status         string `json:"status"`
+	BatchNo        string `json:"batch_no"`
+	Quantity       int    `json:"quantity"`
+	Timestamp      string `json:"timestamp"`
 }
 
 // generateHash computes the hash for the block
@@ -95,19 +99,17 @@ func validBlock(block, prevBlock *Block) bool {
 // validateHash verifies the hash of the block
 func (b *Block) validateHash(hash string) bool {
 	b.generateHash()
-	if b.Hash != hash {
-		return false
-	}
-	return true
+	return b.Hash == hash
 }
 
-// getBlockchain returns the current blockchain as JSON
-func getBlockchain(w http.ResponseWriter, r *http.Request) {
-	jbytes, err := json.MarshalIndent(BlockChain.Blocks, "", " ")
+// GetBlockchain returns the current blockchain as JSON
+func GetBlockchain(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json") // Set the correct content type
+	jbytes, err := json.MarshalIndent(BlockChain.Blocks, "", "    ")
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err)
+		http.Error(w, "Failed to marshal blockchain data", http.StatusInternalServerError)
 		return
 	}
-	io.WriteString(w, string(jbytes))
+	w.WriteHeader(http.StatusOK)
+	w.Write(jbytes)
 }

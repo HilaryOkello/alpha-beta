@@ -7,61 +7,67 @@
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <h2>Manufacturer Dashboard</h2>
-        <button onclick="showAddOrderForm()">Add Vaccine Order</button>
-        <button onclick="showAvailableVaccine()">Check Available Vaccine</button>
-        <button onclick="showOrders()">View Orders</button>
-
-        <div id="content"></div>
-
-        <!-- Hidden data for demonstration purposes -->
-        <div id="data" style="display:none;">
-            <div id="availableVaccinesData" data-vaccines='[
-                {"name": "Vaccine A", "quantity": 100, "expiryDate": "2024-12-31"},
-                {"name": "Vaccine B", "quantity": 200, "expiryDate": "2025-01-15"},
-                {"name": "Vaccine C", "quantity": 300, "expiryDate": "2024-11-30"}
-            ]'></div>
-
-            <div id="ordersData" data-orders='[
-                {"id": 1, "vaccine": "Vaccine A", "quantity": 50, "status": "Pending", "orderDate": "2024-07-01"},
-                {"id": 2, "vaccine": "Vaccine B", "quantity": 100, "status": "Shipped", "orderDate": "2024-06-15"},
-                {"id": 3, "vaccine": "Vaccine C", "quantity": 150, "status": "Delivered", "orderDate": "2024-05-20"}
-            ]'></div>
+    
+    <div class="container">
+        <div class="dashboard-container">
+            <h1>Manufacturer Dashboard</h1>
+            <button onclick="window.location.href='/add-vaccine';">Add Vaccine</button>
+            <button onclick="showAvailableVaccine()">Check Available Vaccine</button>
+            <button onclick="showOrders()">View Orders</button>
+    
+            <div id="content"></div>
+    
+            <!-- Hidden data for demonstration purposes -->
+            <div id="data" style="display:none;">
+                <div id="availableVaccinesData" data-vaccines='[
+                    {"name": "Vaccine A", "quantity": 100, "expiryDate": "2024-12-31"},
+                    {"name": "Vaccine B", "quantity": 200, "expiryDate": "2025-01-15"},
+                    {"name": "Vaccine C", "quantity": 300, "expiryDate": "2024-11-30"}
+                ]'></div>
+    
+                <div id="ordersData" data-orders='[
+                    {"id": 1, "vaccine": "Vaccine A", "quantity": 50, "status": "Pending", "orderDate": "2024-07-01"},
+                    {"id": 2, "vaccine": "Vaccine B", "quantity": 100, "status": "Shipped", "orderDate": "2024-06-15"},
+                    {"id": 3, "vaccine": "Vaccine C", "quantity": 150, "status": "Delivered", "orderDate": "2024-05-20"}
+                ]'></div>
+            </div>
         </div>
+        <section id="transactions">
+            <h2>Transactions</h2>
+            <div class="table-header">
+                <input type="text" id="search-box" placeholder="Search Order ID or Batch Number">
+                <select id="status-filter">
+                    <option value="">All Statuses</option>
+                    <option value="Manufactured">Manufactured</option>
+                    <option value="Manufactured">Pending</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Received">Received</option>
+                    <option value="Stored">Stored</option>
+                    <option value="Administered">Administered</option>
+                </select>
+            </div>
+            <div class="table-container">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Batch No</th>
+                            <th>Manufacturer</th>
+                            <th>Distributor</th>
+                            <th>Health Facility</th>
+                            <th>Status</th>
+                            <th>Quantity</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transaction-table-body">
+                        <!-- Data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
-
     <script>
-        function showAddOrderForm() {
-            document.getElementById('content').innerHTML = `
-                <h3>Add Vaccine Order</h3>
-                <form id="addOrderForm">
-                    <label for="vaccineName">Vaccine Name:</label>
-                    <input type="text" id="vaccineName" name="vaccineName" required>
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" name="quantity" required>
-                    <label for="deliveryDate">Delivery Date:</label>
-                    <input type="date" id="deliveryDate" name="deliveryDate" required>
-                    <label for="priority">Priority:</label>
-                    <select id="priority" name="priority" required>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                    </select>
-                    <button type="submit">Submit Order</button>
-                </form>
-            `;
-
-            document.getElementById('addOrderForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                const vaccineName = document.getElementById('vaccineName').value;
-                const quantity = document.getElementById('quantity').value;
-                const deliveryDate = document.getElementById('deliveryDate').value;
-                const priority = document.getElementById('priority').value;
-                alert(`Order for ${quantity} units of ${vaccineName} added. Delivery Date: ${deliveryDate}, Priority: ${priority}`);
-            });
-        }
-
         function showAvailableVaccine() {
             // Retrieve data from hidden element
             const vaccinesData = document.getElementById('availableVaccinesData').getAttribute('data-vaccines');
@@ -88,5 +94,56 @@
             document.getElementById('content').innerHTML = content;
         }
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    function fetchAndPopulateTable() {
+        fetch('/get-blockchain')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse JSON response
+            })
+            .then(data => {
+                const tableBody = document.getElementById('transaction-table-body');
+                if (!tableBody) {
+                    console.error('Table body element not found');
+                    return;
+                }
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                console.log('Fetched data:', data); // Log the fetched data
+
+                data.forEach(block => {
+                    const transaction = block.Data; // Get the transaction data
+                    console.log('Processing transaction:', transaction); // Log each transaction
+
+                    // Create a new row
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                        <td>${transaction.order_id || 'N/A'}</td>
+                        <td>${transaction.batch_no || 'N/A'}</td>
+                        <td>${transaction.manufacturer || 'N/A'}</td>
+                        <td>${transaction.distributor || 'N/A'}</td>
+                        <td>${transaction.health_facility || 'N/A'}</td>
+                        <td class="status ${transaction.status || 'N/A'}">${transaction.status || 'N/A'}</td>
+                        <td>${transaction.quantity || 'N/A'}</td>
+                        <td>${transaction.timestamp || 'N/A'}</td>
+                    `;
+
+                    console.log('Appending row:', row.innerHTML); // Log the row HTML
+
+                    // Append the new row to the table body
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching blockchain data:', error));
+    }
+
+    // Call the function to populate the table
+    fetchAndPopulateTable();
+});
+        </script>
 </body>
 </html>

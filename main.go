@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +19,7 @@ func main() {
 		log.Println("Usage: 'go run .'")
 		return
 	}
+
 	blockchain.BlockChain = blockchain.NewBlockchain()
 
 	r := mux.NewRouter()
@@ -35,21 +38,22 @@ func main() {
 	r.HandleFunc("/add-facility", handlers.AddFacilityPage).Methods("GET")
 	r.HandleFunc("/add-health-facility-order", handlers.HealthFacilityOrderPage).Methods("GET")
 	r.HandleFunc("/add-vaccine", handlers.AddVaccinePage).Methods("GET")
+	r.HandleFunc("/get-blockchain", blockchain.GetBlockchain)
 
 	// r.HandleFunc("/", getBlockchain).Methods("POST")
-	r.HandleFunc("/distributor-order", handlers.CreateDistributorOrder).Methods("POST")
-	r.HandleFunc("/health-facility-order", handlers.CreateHealthFacilityOrder).Methods("POST")
-	r.HandleFunc("/new-vaccine", handlers.NewVaccine).Methods("POST")
+	// r.HandleFunc("/distributor-order", handlers.CreateDistributorOrder).Methods("POST")
+	// r.HandleFunc("/health-facility-order", handlers.CreateHealthFacilityOrder).Methods("POST")
+	r.HandleFunc("/new-vaccine", handlers.AddVaccineHandler).Methods("POST")
 
-	// go func() {
-	// 	for _, block := range blockchain.BlockChain.Blocks {
-	// 		fmt.Printf("Prev. hash: %x\n", block.PrevHash)
-	// 		bytes, _ := json.MarshalIndent(block.Data, "", " ")
-	// 		fmt.Printf("Data: %v\n", string(bytes))
-	// 		fmt.Printf("Hash: %x\n", block.Hash)
-	// 		fmt.Println()
-	// 	}
-	// }()
+	go func() {
+		for _, block := range blockchain.BlockChain.Blocks {
+			fmt.Printf("Prev. hash: %x\n", block.PrevHash)
+			bytes, _ := json.MarshalIndent(block.Data, "", " ")
+			fmt.Printf("Data: %v\n", string(bytes))
+			fmt.Printf("Hash: %x\n", block.Hash)
+			fmt.Println()
+		}
+	}()
 	log.Println("Listening on port 3000")
 
 	log.Fatal(http.ListenAndServe(":3000", r))
