@@ -10,7 +10,7 @@
     
     <div class="container">
         <h1>Distributor Dashboard</h1>
-        <button onclick="window.location.href='/add-facility';">Place An Order</button>
+        <button onclick="window.location.href='/add-distributor-order';">Place An Order</button>
         <button onclick="window.location.href='/add-manufacturer';">Add New Manufacturer</button>
         <button onclick="window.location.href='/add-facility';">Add New HealthCare Facility</button>
         
@@ -33,6 +33,7 @@
                             <tr>
                                 <th>Order ID</th>
                                 <th>Batch No</th>
+                                <th>Vaccine Name</th> 
                                 <th>Manufacturer</th>
                                 <th>Distributor</th>
                                 <th>Health Facility</th>
@@ -51,54 +52,60 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-    function fetchAndPopulateTable() {
-        fetch('/get-blockchain')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json(); // Parse JSON response
-            })
-            .then(data => {
-                const tableBody = document.getElementById('transaction-table-body');
-                if (!tableBody) {
-                    console.error('Table body element not found');
-                    return;
-                }
-                tableBody.innerHTML = ''; // Clear existing rows
+            function fetchAndPopulateTable() {
+                fetch('/get-blockchain')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json(); // Parse JSON response
+                    })
+                    .then(data => {
+                        const tableBody = document.getElementById('transaction-table-body');
+                        if (!tableBody) {
+                            console.error('Table body element not found');
+                            return;
+                        }
+                        tableBody.innerHTML = ''; // Clear existing rows
 
-                console.log('Fetched data:', data); // Log the fetched data
+                        console.log('Fetched data:', data); // Log the fetched data
 
-                data.forEach(block => {
-                    const transaction = block.Data; // Get the transaction data
-                    console.log('Processing transaction:', transaction); // Log each transaction
+                        data.forEach(block => {
+                            const transaction = block.Data; // Get the transaction data
+                            console.log('Processing transaction:', transaction); // Log each transaction
 
-                    // Create a new row
-                    const row = document.createElement('tr');
+                            // Extract the vaccine name from the details field
+                            const details = transaction.details || '';
+                            const vaccineNameMatch = details.match(/Vaccine: ([^,]+)/);
+                            const vaccineName = vaccineNameMatch ? vaccineNameMatch[1] : 'N/A';
 
-                    row.innerHTML = `
-                        <td>${transaction.order_id || 'N/A'}</td>
-                        <td>${transaction.batch_no || 'N/A'}</td>
-                        <td>${transaction.manufacturer || 'N/A'}</td>
-                        <td>${transaction.distributor || 'N/A'}</td>
-                        <td>${transaction.health_facility || 'N/A'}</td>
-                        <td class="status ${transaction.status || 'N/A'}">${transaction.status || 'N/A'}</td>
-                        <td>${transaction.quantity || 'N/A'}</td>
-                        <td>${transaction.timestamp || 'N/A'}</td>
-                    `;
+                            // Create a new row
+                            const row = document.createElement('tr');
 
-                    console.log('Appending row:', row.innerHTML); // Log the row HTML
+                            row.innerHTML = `
+                                <td>${transaction.order_id || 'N/A'}</td>
+                                <td>${transaction.batch_no || 'N/A'}</td>
+                                <td>${vaccineName || 'N/A'}</td> <!-- Added vaccine name -->
+                                <td>${transaction.manufacturer || 'N/A'}</td>
+                                <td>${transaction.distributor || 'N/A'}</td>
+                                <td>${transaction.health_facility || 'N/A'}</td>
+                                <td class="status ${transaction.status || 'N/A'}">${transaction.status || 'N/A'}</td>
+                                <td>${transaction.quantity || 'N/A'}</td>
+                                <td>${transaction.timestamp || 'N/A'}</td>
+                            `;
 
-                    // Append the new row to the table body
-                    tableBody.appendChild(row);
-                });
-            })
-            .catch(error => console.error('Error fetching blockchain data:', error));
-    }
+                            console.log('Appending row:', row.innerHTML); // Log the row HTML
 
-    // Call the function to populate the table
-    fetchAndPopulateTable();
-});
+                            // Append the new row to the table body
+                            tableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching blockchain data:', error));
+            }
+
+            // Call the function to populate the table
+            fetchAndPopulateTable();
+        });
         </script>
 </body>
 </html>

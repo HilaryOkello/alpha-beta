@@ -44,6 +44,62 @@
             </div>
         </section>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        function fetchAndPopulateTable() {
+            fetch('/get-blockchain')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json(); // Parse JSON response
+                })
+                .then(data => {
+                    const tableBody = document.getElementById('transaction-table-body');
+                    if (!tableBody) {
+                        console.error('Table body element not found');
+                        return;
+                    }
+                    tableBody.innerHTML = ''; // Clear existing rows
 
+                    console.log('Fetched data:', data); // Log the fetched data
+
+                    data.forEach(block => {
+                        const transaction = block.Data; // Get the transaction data
+                        console.log('Processing transaction:', transaction); // Log each transaction
+
+                        // Extract the vaccine name from the details field
+                        const details = transaction.details || '';
+                        const vaccineNameMatch = details.match(/Vaccine: ([^,]+)/);
+                        const vaccineName = vaccineNameMatch ? vaccineNameMatch[1] : 'N/A';
+
+                        // Create a new row
+                        const row = document.createElement('tr');
+
+                        row.innerHTML = `
+                            <td>${transaction.order_id || 'N/A'}</td>
+                            <td>${transaction.batch_no || 'N/A'}</td>
+                            <td>${vaccineName || 'N/A'}</td> <!-- Added vaccine name -->
+                            <td>${transaction.manufacturer || 'N/A'}</td>
+                            <td>${transaction.distributor || 'N/A'}</td>
+                            <td>${transaction.health_facility || 'N/A'}</td>
+                            <td class="status ${transaction.status || 'N/A'}">${transaction.status || 'N/A'}</td>
+                            <td>${transaction.quantity || 'N/A'}</td>
+                            <td>${transaction.timestamp || 'N/A'}</td>
+                        `;
+
+                        console.log('Appending row:', row.innerHTML); // Log the row HTML
+
+                        // Append the new row to the table body
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching blockchain data:', error));
+        }
+
+        // Call the function to populate the table
+        fetchAndPopulateTable();
+    });
+</script>
 </body>
 </html>
