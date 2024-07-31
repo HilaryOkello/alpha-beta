@@ -16,10 +16,11 @@ type Manufacturer struct {
 }
 
 var (
-	availableVaccines      []Vaccine
-	availableManufacturers []Manufacturer
-	vaccineIDCounter       int
-	generateUserID         int
+	availableVaccines          []Vaccine
+	availableDistributorOrders []DistributorOrder
+	vaccineIDCounter           int
+	orderIDCounter             int
+	distributorID              int
 )
 
 // Vaccine represents a vaccine with details
@@ -31,6 +32,14 @@ type Vaccine struct {
 	ExpiryDate      string `json:"expiry_date"`
 	BatchNumber     string `json:"batch_number"`
 	Quantity        int    `json: "quantity"`
+}
+
+type DistributorOrder struct {
+	ID            string `json:"id"`
+	DistributorID string `json:"distributor"`
+	VaccineName   string `json:"vaccine"`
+	Manufacturer  string `json:"manufacturer"`
+	Quantity      string `json:"quantity"`
 }
 
 // Serve the HTML form for the blockchain view
@@ -122,59 +131,49 @@ func Manufacturerdashboard(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func CreateDistributorOrder(w http.ResponseWriter, r *http.Request) {
-// 	var transaction blockchain.VaccineTransaction
-// 	if err := json.NewDecoder(r.Body).Decode(&transaction); err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		log.Printf("could not create distributor order: %v", err)
-// 		w.Write([]byte("could not create distributor order"))
-// 		return
-// 	}
+func CreateDistributorOrder(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		r.ParseForm()
 
-// 	if transaction.TransactionType != "DistributorToManufacturer" {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		w.Write([]byte("invalid transaction type for distributor order"))
-// 		return
-// 	}
+		// Generate a new order ID (this logic can be customized as needed)
+		orderIDCounter++
+		newOrderID := fmt.Sprintf("order%d", orderIDCounter)
+		quantity, _ := strconv.Atoi(r.FormValue("quantity_no"))
+		distributorID++
+		order := DistributorOrder{
+			ID:            newOrderID,
+			DistributorID: fmt.Sprintf("Distributor%d", distributorID),
+			VaccineName:   r.FormValue("vaccine"),
+			Manufacturer:  r.FormValue("manufacturer"),
+			Quantity:      fmt.Sprint(quantity),
+		}
 
-// 	blockchain.BlockChain.AddBlock(transaction)
-// 	resp, err := json.MarshalIndent(transaction, "", " ")
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		log.Printf("could not marshal payload: %v", err)
-// 		w.Write([]byte("could not save distributor order"))
-// 		return
-// 	}
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Write(resp)
-// }
+		availableDistributorOrders = append(availableDistributorOrders, order)
 
-// func CreateHealthFacilityOrder(w http.ResponseWriter, r *http.Request) {
-// 	var transaction blockchain.VaccineTransaction
-// 	if err := json.NewDecoder(r.Body).Decode(&transaction); err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		log.Printf("could not create health facility order: %v", err)
-// 		w.Write([]byte("could not create health facility order"))
-// 		return
-// 	}
+		// Create a new transaction using the form values
+		transaction := blockchain.VaccineTransaction{
+			OrderID:        newOrderID,
+			IsGenesis:      false, // Set this according to your logic
+			Details:        fmt.Sprintf("Vaccine: %s, Manufacturer: %s", r.FormValue("vaccine"), r.FormValue("manufacturer")),
+			Manufacturer:   r.FormValue("manufacturer"),
+			Distributor:    r.FormValue("manufacturer"),
+			HealthFacility: "", // Set this as needed
+			AdministeredTo: "", // Set this as needed
+			Status:         "Pending",
+			BatchNo:        "", // Assuming batch number is not available at this stage
+			Quantity:       quantity,
+			Timestamp:      time.Now().String(),
+		}
 
-// 	if transaction.TransactionType != "FacilityToDistributor" {
-// 		w.WriteHeader(http.StatusBadRequest)
-// 		w.Write([]byte("invalid transaction type for health facility order"))
-// 		return
-// 	}
+		// Add the new transaction to the blockchain
+		blockchain.BlockChain.AddBlock(transaction)
 
-// 	blockchain.BlockChain.AddBlock(transaction)
-// 	resp, err := json.MarshalIndent(transaction, "", " ")
-// 	if err != nil {
-// 		w.WriteHeader(http.StatusInternalServerError)
-// 		log.Printf("could not marshal payload: %v", err)
-// 		w.Write([]byte("could not save health facility order"))
-// 		return
-// 	}
-// 	w.WriteHeader(http.StatusOK)
-// 	w.Write(resp)
-// }
+		// Redirect to a relevant page after order creation
+		http.Redirect(w, r, "/distributor-dashboard", http.StatusSeeOther)
+	} else {
+		http.Error(w, "Bad Method Request", http.StatusBadRequest)
+	}
+}
 
 func AddVaccineHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {

@@ -40,9 +40,7 @@ func main() {
 	r.HandleFunc("/add-vaccine", handlers.AddVaccinePage).Methods("GET")
 	r.HandleFunc("/get-blockchain", blockchain.GetBlockchain)
 
-	// r.HandleFunc("/", getBlockchain).Methods("POST")
-	// r.HandleFunc("/distributor-order", handlers.CreateDistributorOrder).Methods("POST")
-	// r.HandleFunc("/health-facility-order", handlers.CreateHealthFacilityOrder).Methods("POST")
+	//r.HandleFunc("/distributor-order", handlers.CreateDistributorOrder).Methods("POST")
 	r.HandleFunc("/new-vaccine", handlers.AddVaccineHandler).Methods("POST")
 
 	go func() {
