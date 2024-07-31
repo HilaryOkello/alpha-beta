@@ -1,6 +1,4 @@
-# Alpha-Beta (Vaccine Distribution and Administration Tracking Platform)
-
-## Overview
+# Alpha-Beta
 
 This project is a platform designed to track the distribution and administration of vaccines from the manufacturer to the patient, leveraging blockchain for transparency and Go APIs for data integration and analytics. The platform aims to address challenges in Kenya's vaccine distribution system, ensuring secure, transparent, and efficient vaccine tracking.
 
